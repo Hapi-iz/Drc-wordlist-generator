@@ -1,24 +1,3 @@
-import subprocess
-import sys
-
-def check_pip_installed():
-    try:
-        subprocess.check_call([sys.executable, "-m", "ensurepip"])
-    except subprocess.CalledProcessError:
-        print("[bold red]Error: pip is not installed. Please install pip to continue.[/bold red]")
-        sys.exit(1)
-
-
-check_pip_installed()
-
-try:
-    import rich
-except ImportError:
-    print("Rich library is not installed. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "rich"])
-
-
-
 import itertools
 import argparse
 import os
@@ -67,7 +46,9 @@ def get_predefined_charset(option):
     return charsets.get(option, None)
 
 def generate_wordlist_for_length(charset, length, prefix, suffix):
-    return [prefix + "".join(word) + suffix for word in itertools.product(charset, repeat=length)]
+    """Yield generated words one by one instead of creating a list."""
+    for word in itertools.product(charset, repeat=length):
+        yield prefix + "".join(word) + suffix
 
 def generate_wordlist(charset, min_length, max_length, prefix, suffix, output_file, limit, threads):
     count = 0
@@ -76,25 +57,26 @@ def generate_wordlist(charset, min_length, max_length, prefix, suffix, output_fi
 
     # Warn if wordlist is large
     if total_words > 1000000:
-        console.print("[bold yellow]Warning: This is a large wordlist. It will be generated shortly, but it may take some time.\n\nNote: The progress bar may not work properly due to the large size of the wordlist.\n[/bold yellow]")
+        console.print("[bold yellow]Warning: This is a large wordlist. It may take some time to generate.[/bold yellow]")
 
     # Initialize progress bar and start time
     start_time = time.time()
-    words_to_generate = []
-    
+
     try:
         with open(output_file, "w") as file:
             with Progress() as progress:
                 task = progress.add_task("[bold cyan]⚡ Generating words...", total=total_words)
 
-                # Create the wordlist in parallel
+                # Use a ThreadPoolExecutor for parallel processing
                 with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+                    futures = []
+
+                    # Submit tasks for each length
                     for length in range(min_length, max_length + 1):
-                        future = executor.submit(generate_wordlist_for_length, charset, length, prefix, suffix)
-                        words_to_generate.append(future)
-                    
+                        futures.append(executor.submit(generate_wordlist_for_length, charset, length, prefix, suffix))
+
                     # Write the generated words to the file
-                    for future in concurrent.futures.as_completed(words_to_generate):
+                    for future in concurrent.futures.as_completed(futures):
                         for word in future.result():
                             if limit and count >= limit:
                                 console.print(f"\n[green]✔ Wordlist limit reached: {limit} words saved.[/green]")
@@ -113,6 +95,7 @@ def generate_wordlist(charset, min_length, max_length, prefix, suffix, output_fi
     except Exception as e:
         console.print(f"[bold red]Error: {e}[/bold red]")
         return
+
 
 def print_wordlist_description(charset, min_length, max_length, prefix, suffix, threads):
     charset_desc = f"Charset used: {charset}\n"
