@@ -1,8 +1,8 @@
-# DRC Wordlist Generator
+#  Wordlist Generator
 
 ## Overview
 
-Welcome to the **DRC Wordlist Generator**! This script generates wordlists based on specified character sets, word length ranges, and optional prefixes/suffixes. It uses the powerful `rich` library to display progress in a beautiful, user-friendly way.
+Welcome to the **Wordlist Generator**! This script generates wordlists based on specified character sets, word length ranges, and optional prefixes/suffixes. It uses the powerful `rich` library to display progress in a beautiful, user-friendly way.
 
 If you want to generate a custom wordlist for penetration testing, cybersecurity exercises, or just for fun, this tool is perfect for you.
 
@@ -55,7 +55,7 @@ The script checks if the necessary dependencies are installed. If the required l
 ### Basic Command-Line Usage
 
 ```bash
-python3 drcwl.py -c a12b -min 3 -max 5 -o output.txt
+python3 wordgen.py -c a12b -min 3 -max 5 -o output.txt
 ```
 ---
 
