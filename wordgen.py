@@ -11,17 +11,8 @@ from rich.text import Text
 console = Console()
 
 def print_banner():
-    banner = Text("""                                      
-    //    ) )     //   ) )     //   ) ) 
-   //    / /     //___/ /     //        
-  //    / /     / ___ (      //         
- //    / /     //   | |     //          
-//____/ /     //    | |    ((____/ /    
-                                   
-""", style="blue")
-
-    console.print(banner)
-    console.print("[bold cyan]🚀 Welcome to DRC Wordlist Generator! 🔥[/bold cyan]")
+    
+    console.print("[bold cyan]🚀 Welcome to Wordlist Generator! 🔥[/bold cyan]")
 
 def validate_input(min_length, max_length, charset):
     if min_length <= 0 or max_length <= 0:
@@ -109,7 +100,7 @@ def print_wordlist_description(charset, min_length, max_length, prefix, suffix, 
 if __name__ == "__main__":
     print_banner()
 
-    parser = argparse.ArgumentParser(description="DRC Wordlist Generator")
+    parser = argparse.ArgumentParser(description="Wordlist Generator")
     parser.add_argument("-c", "--charset", type=str, required=True, help="Character set (e.g., 'abc123!@#')")
     parser.add_argument("-min", "--min_length", type=int, required=True, help="Minimum word length")
     parser.add_argument("-max", "--max_length", type=int, required=True, help="Maximum word length")
